@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1A2B Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+            background: linear-gradient(to bottom, #ffefd5, #ffe4b5);
+            color: #333;
+        }
+        input, button {
+            margin: 5px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #f4a460;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #cd853f;
+        }
+        .result {
+            margin-top: 20px;
+        }
+        h1 {
+            color: #d2691e;
+        }
+        .result ul {
+            list-style: none;
+            padding: 0;
+        }
+        .result li {
+            background: #fff8dc;
+            margin: 5px auto;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #deb887;
+            width: 80%;
+            max-width: 400px;
+        }
+    </style>
+</head>
+<body>
+    <h1>112207415_HW6_1A2BGAME</h1>
+    <p>猜一個由四個不重複數字組成的答案</p>
+    <input id="guessInput" type="text" maxlength="4" placeholder="輸入四個數字">
+    <button onclick="submitGuess()">提交答案</button>
+    <p id="message"></p>
+    <div class="result">
+        <h2>猜測紀錄</h2>
+        <ul id="history"></ul>
+    </div>
+
+    <script>
+        let answer = generateAnswer();
+        let attempts = 0;
+
+        function generateAnswer() {
+            const digits = Array.from({ length: 10 }, (_, i) => i.toString());
+            const result = [];
+            while (result.length < 4) {
+                const index = Math.floor(Math.random() * digits.length);
+                result.push(digits.splice(index, 1)[0]);
+            }
+            return result;
+        }
+
+        function validateInput(input) {
+            if (input.length !== 4 || !/^[0-9]+$/.test(input)) {
+                return "輸入需為四個數字。";
+            }
+            if (new Set(input).size !== 4) {
+                return "輸入的數字不能重複。";
+            }
+            return "";
+        }
+
+        function calculateResult(input) {
+            let A = 0, B = 0;
+            input.split('').forEach((digit, index) => {
+                if (answer[index] === digit) {
+                    A++;
+                } else if (answer.includes(digit)) {
+                    B++;
+                }
+            });
+            return `${A}A${B}B`;
+        }
+
+        function submitGuess() {
+            const guessInput = document.getElementById("guessInput").value;
+            const errorMessage = validateInput(guessInput);
+
+            if (errorMessage) {
+                alert(errorMessage);
+                return;
+            }
+
+            attempts++;
+            const result = calculateResult(guessInput);
+            const history = document.getElementById("history");
+            const listItem = document.createElement("li");
+            listItem.textContent = `第 ${attempts} 次：${guessInput} - ${result}`;
+            history.appendChild(listItem);
+
+            if (result === "4A0B") {
+                alert(`答對了！總共嘗試了 ${attempts} 次。`);
+                resetGame();
+            }
+
+            document.getElementById("guessInput").value = "";
+        }
+
+        function resetGame() {
+            answer = generateAnswer();
+            attempts = 0;
+            document.getElementById("history").innerHTML = "";
+        }
+    </script>
+</body>
+</html>
+
